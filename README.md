@@ -1,3 +1,5 @@
+docker build -t myubuntu . && docker container run -it -v /var/run/docker.sock:/var/run/docker.sock -v ./:/repo myubuntu /bin/bash
+
 # aesd-assignments
 This repo contains public starter source code, scripts, and documentation for Advanced Embedded Software Development (ECEN-5713) and Advanced Embedded Linux Development assignments University of Colorado, Boulder.
 
