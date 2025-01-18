@@ -27,7 +27,7 @@ apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
 adduser docker
 
-usermod -aG docker $USER
+# usermod -aG docker $USER
 
 
 
