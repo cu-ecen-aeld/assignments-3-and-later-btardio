@@ -7,7 +7,7 @@
 
 int writer(char* file, char* string) {
 
-    printf("start here hello world\n");
+
 
     FILE* fp = fopen(file, "w");
 
@@ -53,5 +53,5 @@ int main(int argc, char *argv[]) {
     free(file);
     free(string);
 
-    return chars_written;
+    return 0;
 }

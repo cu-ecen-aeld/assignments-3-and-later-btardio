@@ -15,7 +15,7 @@ RUN wget https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/
 RUN tar -xvf arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
 RUN apt-get install -y python3
 RUN apt-get install -y python3-dev
-
+RUN apt-get install -y file
 ENTRYPOINT ["/entrypoint.sh"]
 
 
