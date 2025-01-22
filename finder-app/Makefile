@@ -30,7 +30,7 @@ vars:
 
 writer: vars
 	$(info ${CROSS_COMPILE})
-	$(info $(COMPILER_EXECUTABLE) $(CCFLAGS) $(AAA))
-	@($(COMPILER_EXECUTABLE) $(CCFLAGS) $(AAA))
+	$(info $(COMPILER_EXECUTABLE) -Wall $(CCFLAGS) $(AAA))
+	@($(COMPILER_EXECUTABLE) -Wall $(CCFLAGS) $(AAA))
 
 
