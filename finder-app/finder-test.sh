@@ -2,8 +2,8 @@
 # Tester script for assignment 1 and assignment 2
 # Author: Siddhant Jajoo
 
-make clean
-gcc -o writer writer.c
+#make clean
+#gcc -o writer writer.c
 
 set -e
 set -u
