@@ -5,6 +5,16 @@
 #include <threads.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+
+bool file_exists(const char *filename)
+{
+    struct stat buffer;
+    return stat(filename, &buffer) == 0 ? true : false;
+}
+
+
 /**
  * @param cmd the command to execute with system()
  * @return true if the command in @param cmd was executed
@@ -46,21 +56,14 @@ bool do_exec(int count, ...) {
     char **items;
 
     items = malloc(sizeof(char*) * (count + 1));
-    items[count+2] = '\0';
+    items[count] = '\0';
     int i;
     for (i = 0; i < count; i++) {
         command[i] = va_arg(args, char *);
         items[i] = malloc(sizeof(char) * strlen(command[i]) + 1);
-        memcpy(items[i], command[i], strlen(command[i]) + 1);
-        items[i][strlen(command[i]) + 1] = '\0';
-        //items[i] = malloc(sizeof(char) * sizeof(command[i]));
-        //memcpy(items[i], command[i], sizeof(command[i]));
-        printf("command[i]: %s\n", items[i]);
+        memcpy(items[i], command[i], strlen(command[i]));
+        items[i][strlen(command[i])] = '\0';
     }
-    //command[count] = NULL;
-    // this line is to avoid a compile warning before your implementation is complete
-    // and may be removed
-    //command[count] = command[count];
 
     /*
      * TODO:
@@ -73,40 +76,34 @@ bool do_exec(int count, ...) {
     */
 
     va_end(args);
-    //
-    // printf("%d\n", getpid());
-    // printf("parent process\n");
-    // printf("cmd:\n");
-    // printf("%s\n", items[0]);
-    // printf("args:\n");
-    // for (int i = 1; i < count; i++) {
-    //     printf("%s\n", items[i]);
-    // }
 
-    //printf("%s\n", command[i]);
+
+    if (false == file_exists(items[0])) {
+        return false;
+    }
+
+    if (access(items[0], F_OK) != 0) {
+        return false;
+    }
+
+    char *result = strchr(items[0], '/');
+
+    if (result == NULL) {
+        return false;
+    }
 
     pid_t p = fork();
     if ( p  == 0 ) {
-        printf("%d\n", p);
-        printf("child process created\n");
-        printf("cmd:\n");
-        printf("%s\n", items[0]);
-        printf("args:\n");
-        for (int i = 1; i < count; i++) {
-            printf("%s\n", items[i]);
-        }
-        if (execv(strcat("/usr/bin", items[0]), &items[1]) == -1) {
+        if (execv(items[0], &items[1]) == -1) {
             perror("execv failed");
-
-        }
-        //break;
-        printf("~child is done\n");
+        }                   
+        
+//        if (execv(strcat("/usr/bin", items[0]), &items[1]) == -1) {
+//            perror("execv failed");
+//        }
     } else {
         waitpid(p, NULL, 0);
-        printf("~parent is done\n");
     }
-
-    printf("both get here");
 
     return true;
 }
@@ -120,15 +117,28 @@ bool do_exec_redirect(const char *outputfile, int count, ...) {
     va_list args;
     va_start(args, count);
     char *command[count + 1];
+        
+    char **items;
+
+    items = malloc(sizeof(char*) * (count + 1));
+    items[count] = '\0';
+
+    
     int i;
     for (i = 0; i < count; i++) {
         command[i] = va_arg(args, char *);
+        items[i] = malloc(sizeof(char) * strlen(command[i]) + 1);
+        memcpy(items[i], command[i], strlen(command[i]));
+        items[i][strlen(command[i])] = '\0';
     }
-    command[count] = NULL;
+//    command[count] = NULL;
     // this line is to avoid a compile warning before your implementation is complete
     // and may be removed
-    command[count] = command[count];
+//    command[count] = command[count];
 
+
+	// that little page file that all of us students have the mysterious c 'walk off the cliff' error when our 
+	// programs get too big is about to get a lot smaller in embedded
 
     /*
      * TODO
@@ -139,6 +149,34 @@ bool do_exec_redirect(const char *outputfile, int count, ...) {
     */
 
     va_end(args);
+
+    int fd = open(outputfile, O_WRONLY|O_TRUNC|O_CREAT, 0644);
+
+    if (fd < 0) { 
+        perror("open"); abort(); 
+    }
+
+
+
+    pid_t p = fork();
+    if ( p  == 0 ) {
+
+        if (dup2(fd, 1) < 0) { 
+            perror("dup2"); 
+            abort(); 
+        }
+    
+        if (execv(strcat("/usr/bin", items[0]), &items[1]) == -1) {
+            perror("execv failed");
+        }
+
+
+    } else {
+        waitpid(p, NULL, 0);
+    }
+ 
+
+    close(fd);
 
     return true;
 }
