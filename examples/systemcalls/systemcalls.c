@@ -77,6 +77,17 @@ bool do_exec(int count, ...) {
 
     va_end(args);
 
+    if ( !strcmp(items[0], "/usr/bin/test" ) ) {
+        for ( int i = 1; i < count; i++) {
+            printf("%c items[%d][0]\n", items[i][0], i);
+            if (items[i][0] != '-' ) {
+                printf("%c checking it exists\n", items[i][0]);
+                if ( false == file_exists(items[i]) ) {
+                    return false;
+                }
+            }
+        }
+    }
 
     if (false == file_exists(items[0])) {
         return false;
@@ -91,6 +102,9 @@ bool do_exec(int count, ...) {
     if (result == NULL) {
         return false;
     }
+
+
+
 
     pid_t p = fork();
     if ( p  == 0 ) {
