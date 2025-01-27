@@ -164,7 +164,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...) {
 
     va_end(args);
 
-    int fd = open(outputfile, O_WRONLY|O_TRUNC|O_CREAT, 0644);
+    int fd = open(outputfile, O_RDWR|O_TRUNC|O_CREAT, 0644);
 
     if (fd < 0) { 
         perror("open"); abort(); 
@@ -174,13 +174,17 @@ bool do_exec_redirect(const char *outputfile, int count, ...) {
 
     pid_t p = fork();
     if ( p  == 0 ) {
+        sleep(10);
+
+        printf("filed descriptor stdout is open: %d\n", fcntl(1, F_GETFD));
+        printf("filed descriptor fd is open: %d\n", fcntl(fd, F_GETFD));
 
         if (dup2(fd, 1) < 0) { 
             perror("dup2"); 
             abort(); 
         }
-    
-        if (execv(strcat("/usr/bin", items[0]), &items[1]) == -1) {
+        if (execv(items[0], &items[1]) == -1) {
+        //if (execv(strcat("/usr/bin", items[0]), &items[1]) == -1) {
             perror("execv failed");
         }
 
