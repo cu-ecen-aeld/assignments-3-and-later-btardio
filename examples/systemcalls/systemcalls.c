@@ -137,13 +137,18 @@ bool do_exec_redirect(const char *outputfile, int count, ...) {
     items = malloc(sizeof(char*) * (count + 1));
     items[count] = '\0';
 
-    
+    char* quote = malloc(sizeof(char));
+    *quote = '\"';
+
+
     int i;
     for (i = 0; i < count; i++) {
         command[i] = va_arg(args, char *);
-        items[i] = malloc(sizeof(char) * strlen(command[i]) + 1);
-        memcpy(items[i], command[i], strlen(command[i]));
-        items[i][strlen(command[i])] = '\0';
+        items[i] = malloc(sizeof(char) * strlen(command[i]) + 3);
+        memcpy( &(items[i][0]), quote, 1);
+	memcpy(&(items[i][1]), command[i], strlen(command[i]));
+        memcpy( &(items[i][1 + strlen(command[i])]), quote, 1);
+	items[i][2+strlen(command[i])] = '\0';
     }
 //    command[count] = NULL;
     // this line is to avoid a compile warning before your implementation is complete
@@ -163,38 +168,56 @@ bool do_exec_redirect(const char *outputfile, int count, ...) {
     */
 
     va_end(args);
-
+/*
     int fd = open(outputfile, O_RDWR|O_TRUNC|O_CREAT, 0644);
 
     if (fd < 0) { 
-        perror("open"); abort(); 
+        perror("open"); 
+	abort(); 
     }
-
+*/
 
 
     pid_t p = fork();
     if ( p  == 0 ) {
-        sleep(10);
+        sleep(1);
+
+	printf("this open?\n");
+	int fd = open(outputfile, O_RDWR|O_TRUNC|O_CREAT, 0644);
+	printf("...");
+	if (fd < 0) {
+        	perror("open");
+        	abort();
+    	}
 
         printf("filed descriptor stdout is open: %d\n", fcntl(1, F_GETFD));
         printf("filed descriptor fd is open: %d\n", fcntl(fd, F_GETFD));
 
-        if (dup2(fd, 1) < 0) { 
-            perror("dup2"); 
-            abort(); 
-        }
-        if (execv(items[0], &items[1]) == -1) {
+//        if (dup2(1, fd) < 0) { 
+//            perror("dup2"); 
+//            abort(); 
+//        }
+	printf(">>> %s <<<\n", items[0]);
+	printf(">>> %s <<<\n", items[1]);
+	printf(">>> %s <<<\n", items[2]);
+        if (execvp(items[0], &items[1]) != 0) {
         //if (execv(strcat("/usr/bin", items[0]), &items[1]) == -1) {
-            perror("execv failed");
+            printf("~~~");
+	    fsync(1);
+	    perror("execv failed");
+	    printf("error isn't handled -1\n");
+
         }
 
-
+	fsync(fd);
+	close(fd);
+	printf("closed\n");
     } else {
         waitpid(p, NULL, 0);
     }
- 
+    printf("return\n");
 
-    close(fd);
+    //close(fd);
 
     return true;
 }
