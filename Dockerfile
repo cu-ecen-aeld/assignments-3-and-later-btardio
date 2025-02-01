@@ -16,6 +16,26 @@ RUN apt-get install -y python3
 RUN apt-get install -y gdb
 RUN apt-get install -y file
 RUN apt-get install -y syslog-ng
+RUN apt-get install -y libncurses-dev
+RUN apt-get install -y flex
+
+RUN apt-get install -y autotools-dev
+RUN apt-get install -y autoconf
+RUN apt-get install -y autopoint
+RUN apt-get install -y bison
+# RUN git clone https://github.com/akimd/bison.git
+# RUN cd bison && git submodule update --init
+# 
+
+# RUN git config --global --add safe.directory /repo/bison
+# RUN git config --global --add safe.directory /repo/bison/gnulib
+# RUN cd bison && ./bootstrap
+
+
+
+RUN apt-get install -y libssl-dev
+RUN apt-get install -y bc
+RUN apt-get install -y libelf-dev
 ADD entrypoint.sh /entrypoint.sh
 RUN echo "set number" >> /root/.vimrc
 RUN echo "set laststatus=2" >> /root/.vimrc
@@ -23,6 +43,7 @@ RUN echo "filetype plugin indent on" >> /root/.vimrc
 RUN echo "set tabstop=4" >> /root/.vimrc
 RUN echo "set shiftwidth=4" >> /root/.vimrc
 RUN echo "set expandtab" >> /root/.vimrc
+RUN echo "export PATH=$PATH:/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-linux-gnu/bin/" >> /root/.bashrc
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 

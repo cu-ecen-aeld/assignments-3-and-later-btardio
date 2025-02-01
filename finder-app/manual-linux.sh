@@ -5,13 +5,15 @@
 set -e
 set -u
 
-OUTDIR=/tmp/aeld
+#OUTDIR=/tmp/aeld
+OUTDIR=$(pwd)/tmp/aeld
 KERNEL_REPO=git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
 KERNEL_VERSION=v5.15.163
 BUSYBOX_VERSION=1_33_1
 FINDER_APP_DIR=$(realpath $(dirname $0))
 ARCH=arm64
 CROSS_COMPILE=aarch64-none-linux-gnu-
+MYPWD=$(pwd)
 
 if [ $# -lt 1 ]
 then
@@ -34,6 +36,11 @@ if [ ! -e ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ]; then
     echo "Checking out version ${KERNEL_VERSION}"
     git checkout ${KERNEL_VERSION}
 
+
+    make
+
+
+
     # TODO: Add your kernel build steps here
 fi
 
@@ -44,27 +51,59 @@ cd "$OUTDIR"
 if [ -d "${OUTDIR}/rootfs" ]
 then
 	echo "Deleting rootfs directory at ${OUTDIR}/rootfs and starting over"
-    sudo rm  -rf ${OUTDIR}/rootfs
+    # NOTE: previous sudo
+    rm  -rf ${OUTDIR}/rootfs
 fi
 
 # TODO: Create necessary base directories
 
+mkdir -p $OUTDIR/rootfs
+mkdir -p $OUTDIR/rootfs/bin
+mkdir -p $OUTDIR/rootfs/dev
+mkdir -p $OUTDIR/rootfs/etc
+mkdir -p $OUTDIR/rootfs/home
+mkdir -p $OUTDIR/rootfs/lib
+mkdir -p $OUTDIR/rootfs/lib64
+mkdir -p $OUTDIR/rootfs/proc
+mkdir -p $OUTDIR/rootfs/sbin
+mkdir -p $OUTDIR/rootfs/sys
+mkdir -p $OUTDIR/rootfs/tmp
+mkdir -p $OUTDIR/rootfs/usr
+mkdir -p $OUTDIR/rootfs/usr/bin
+mkdir -p $OUTDIR/rootfs/usr/lib
+mkdir -p $OUTDIR/rootfs/usr/sbin
+mkdir -p $OUTDIR/rootfs/var
+mkdir -p $OUTDIR/rootfs/var/log
+
 cd "$OUTDIR"
 if [ ! -d "${OUTDIR}/busybox" ]
 then
-git clone git://busybox.net/busybox.git
+    #git clone git://busybox.net/busybox.git
+    git clone https://github.com/mirror/busybox.git
     cd busybox
     git checkout ${BUSYBOX_VERSION}
     # TODO:  Configure busybox
+
+    make distclean
+    make defconfig
+    make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE}
+    make CONFIG_PREFIX=$OUTDIR/rootfs ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
+
 else
     cd busybox
 fi
 
 # TODO: Make and install busybox
 
+cp -r ${MYPWD}/libdep/* $OUTDIR/rootfs/
+
 echo "Library dependencies"
-${CROSS_COMPILE}readelf -a bin/busybox | grep "program interpreter"
-${CROSS_COMPILE}readelf -a bin/busybox | grep "Shared library"
+
+# NOTE: bin/busybox previously
+${CROSS_COMPILE}readelf -a ${OUTDIR}/busybox/busybox | grep "program interpreter"
+${CROSS_COMPILE}readelf -a ${OUTDIR}/busybox/busybox | grep "Shared library"
+
+mknod -m 666 dev/null
 
 # TODO: Add library dependencies to rootfs
 
