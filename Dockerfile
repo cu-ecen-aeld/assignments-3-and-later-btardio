@@ -36,6 +36,10 @@ RUN apt-get install -y bison
 RUN apt-get install -y libssl-dev
 RUN apt-get install -y bc
 RUN apt-get install -y libelf-dev
+
+RUN apt-get install -y cpio
+RUN apt-get install -y qemu-system-arm qemu
+
 ADD entrypoint.sh /entrypoint.sh
 RUN echo "set number" >> /root/.vimrc
 RUN echo "set laststatus=2" >> /root/.vimrc

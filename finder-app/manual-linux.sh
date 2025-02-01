@@ -36,8 +36,26 @@ if [ ! -e ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ]; then
     echo "Checking out version ${KERNEL_VERSION}"
     git checkout ${KERNEL_VERSION}
 
+#    CXX=/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-gcc
+#    export CXX
+    
+#    make clean
 
-    make
+#    make defconfig
+    
+#    make
+    make ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- mrproper
+
+    make ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- defconfig
+
+    make -j4 ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- all
+
+
+    make ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- modules
+
+    make ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- dtbs
+
+    #make
 
 
 
@@ -103,7 +121,17 @@ echo "Library dependencies"
 ${CROSS_COMPILE}readelf -a ${OUTDIR}/busybox/busybox | grep "program interpreter"
 ${CROSS_COMPILE}readelf -a ${OUTDIR}/busybox/busybox | grep "Shared library"
 
-mknod -m 666 dev/null
+mknod -m 666 $OUTDIR/rootfs/dev/null c 1 3
+
+mknod -m 666 $OUTDIR/rootfs/dev/console c 5 1
+
+cd "$OUTDIR/rootfs"
+
+find . | cpio -H newc -ov --owner root:root > ${OUTDIR}/initramfs.cpio
+
+gzip -c -f ${OUTDIR}/initramfs.cpio > ${OUTDIR}/initramfs.cpio.gz
+
+#cp initramfs.cpio.gz ${OUTDIR}/
 
 # TODO: Add library dependencies to rootfs
 
