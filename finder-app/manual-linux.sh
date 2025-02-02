@@ -96,8 +96,9 @@ mkdir -p $OUTDIR/rootfs/var/log
 cd "$OUTDIR"
 if [ ! -d "${OUTDIR}/busybox" ]
 then
-    #git clone git://busybox.net/busybox.git
-    git clone https://github.com/mirror/busybox.git
+    git clone git://busybox.net/busybox.git
+    # git clone https://github.com/mirror/busybox.git
+    
     cd busybox
     git checkout ${BUSYBOX_VERSION}
     # TODO:  Configure busybox
@@ -105,27 +106,40 @@ then
     make distclean
     make defconfig
     make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE}
-    make CONFIG_PREFIX=$OUTDIR/rootfs ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
-
+    make CONFIG_PREFIX=${OUTDIR}/rootfs ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
+    
 else
     cd busybox
+    make CONFIG_PREFIX=${OUTDIR}/rootfs ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
 fi
 
 # TODO: Make and install busybox
 
-cp -r ${MYPWD}/libdep/* $OUTDIR/rootfs/
+
+cp -r ${MYPWD}/lib_dependencies/* $OUTDIR/rootfs/
 
 echo "Library dependencies"
 
 # NOTE: bin/busybox previously
-${CROSS_COMPILE}readelf -a ${OUTDIR}/busybox/busybox | grep "program interpreter"
-${CROSS_COMPILE}readelf -a ${OUTDIR}/busybox/busybox | grep "Shared library"
+#${CROSS_COMPILE}readelf -a ${OUTDIR}/busybox/busybox | grep "program interpreter"
+#${CROSS_COMPILE}readelf -a ${OUTDIR}/busybox/busybox | grep "Shared library"
+
+
+
+#${CROSS_COMPILE}readelf -a ${OUTDIR}/bin/busybox | grep "program interpreter"
+#${CROSS_COMPILE}readelf -a ${OUTDIR}/bin/busybox | grep "Shared library"
 
 mknod -m 666 $OUTDIR/rootfs/dev/null c 1 3
 
 mknod -m 666 $OUTDIR/rootfs/dev/console c 5 1
 
-cd "$OUTDIR/rootfs"
+cd "${OUTDIR}/rootfs"
+
+cp ${OUTDIR}/linux-stable/arch/arm64/boot/Image ${OUTDIR}
+
+chown -R nobody:4 ${OUTDIR}/busybox
+
+chown -R nobody:4 ${OUTDIR}/linux-stable
 
 find . | cpio -H newc -ov --owner root:root > ${OUTDIR}/initramfs.cpio
 
