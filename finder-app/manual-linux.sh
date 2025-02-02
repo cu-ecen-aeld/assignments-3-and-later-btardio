@@ -144,18 +144,23 @@ chown -R nobody:4 ${OUTDIR}/linux-stable
 mkdir -p ${OUTDIR}/rootfs/home/conf
 cp ${MYPWD}/finder.sh ${OUTDIR}/rootfs/home/
 cp ${MYPWD}/finder-test.sh ${OUTDIR}/rootfs/home/
-cp ${MYPWD}/writer ${OUTDIR}/rootfs/home/
+#cp ${MYPWD}/writer ${OUTDIR}/rootfs/home/
 cp ${MYPWD}/conf/assignment.txt ${OUTDIR}/rootfs/home/conf/
 cp ${MYPWD}/conf/username.txt ${OUTDIR}/rootfs/home/conf/
 cp ${MYPWD}/autorun-qemu.sh ${OUTDIR}/rootfs/home/
 
 
-find . | cpio -H newc -ov --owner root:root > ${OUTDIR}/initramfs.cpio
+#find . | cpio -H newc -ov --owner root:root > ${OUTDIR}/initramfs.cpio
 
-gzip -c -f ${OUTDIR}/initramfs.cpio > ${OUTDIR}/initramfs.cpio.gz
+#gzip -c -f ${OUTDIR}/initramfs.cpio > ${OUTDIR}/initramfs.cpio.gz
 
 bash -c "cd ${MYPWD} && make CROSS_COMPILE=aarch64-none-linux-gnu-"
 
+cp ${MYPWD}/writer ${OUTDIR}/rootfs/home/
+
+find . | cpio -H newc -ov --owner root:root > ${OUTDIR}/initramfs.cpio
+
+gzip -c -f ${OUTDIR}/initramfs.cpio > ${OUTDIR}/initramfs.cpio.gz
 
 #cp initramfs.cpio.gz ${OUTDIR}/
 
