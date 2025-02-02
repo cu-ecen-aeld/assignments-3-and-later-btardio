@@ -141,9 +141,21 @@ chown -R nobody:4 ${OUTDIR}/busybox
 
 chown -R nobody:4 ${OUTDIR}/linux-stable
 
+mkdir -p ${OUTDIR}/rootfs/home/conf
+cp ${MYPWD}/finder-app/finder.sh ${OUTDIR}/rootfs/home/
+cp ${MYPWD}/finder-app/finder-test.sh ${OUTDIR}/rootfs/home/
+cp ${MYPWD}/finder-app/writer ${OUTDIR}/rootfs/home/
+cp ${MYPWD}/finder-app/conf/assignment.txt ${OUTDIR}/rootfs/home/conf/
+cp ${MYPWD}/finder-app/conf/username.txt ${OUTDIR}/rootfs/home/conf/
+cp ${MYPWD}/finder-app/autorun-qemu.sh ${OUTDIR}/rootfs/home/
+
+
 find . | cpio -H newc -ov --owner root:root > ${OUTDIR}/initramfs.cpio
 
 gzip -c -f ${OUTDIR}/initramfs.cpio > ${OUTDIR}/initramfs.cpio.gz
+
+bash -c "cd ${MYPWD}/finder-app && make CROSS_COMPILE=aarch64-none-linux-gnu-"
+
 
 #cp initramfs.cpio.gz ${OUTDIR}/
 

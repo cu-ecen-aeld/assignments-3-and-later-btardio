@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 if [ $# -lt 2 ]
 then
@@ -31,13 +31,15 @@ function skip() {
 }
 
 function lastcall() {
-  declare -i output=0
+  # declare -i output=0
+  output=0
   find "$filesdirectory" -type f -print0 | while read -r -d $'\0' file
   do
     count=$(grep -c "$search_str" "$file")
-    declare -i num_count="$count"
+    # declare -i num_count="$count"
 
-    output=$((output + num_count))
+
+    output=$((output + count))
     echo "$output"
   done
 }

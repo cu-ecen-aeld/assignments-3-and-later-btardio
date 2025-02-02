@@ -2,9 +2,9 @@ default: writer
 
 UNAME_P := $(shell uname -p)
 
-COMPILER_EXECUTABLE=gcc
+COMPILER_EXECUTABLE=$(CROSS_COMPILE)gcc
 
-AAA = gcc -o writer writer.c
+OBJ = -o writer writer.c
 
 clean:
 	rm -f writer
@@ -12,25 +12,25 @@ clean:
 vars:
 
     UNAME_P := $(shell uname -p)
-    ifeq ($(UNAME_P),x86_64)
-        CCFLAGS += -D AMD64
-        COMPILER_EXECUTABLE=gcc
-        AAA = -o writer writer.c
+    #    ifeq ($(UNAME_P),x86_64)
+#        CCFLAGS += -D AMD64
+#        COMPILER_EXECUTABLE=gcc
+#        AAA = -o writer writer.c
 
-    endif
-    ifeq ($(UNAME_P),ARM)
-        CCFLAGS += -D ARM
-        COMPILER_EXECUTABLE=/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-gcc
-        AAA = -o writer writer.c
-    endif
-    ifeq ($(CROSS_COMPILE),ARM)
-    	COMPILER_EXECUTABLE=/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-gcc
-    	AAA = -o writer writer.c
-    endif
+#    endif
+#    ifeq ($(UNAME_P),ARM)
+#        CCFLAGS += -D ARM
+#        COMPILER_EXECUTABLE=/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-gcc
+#        AAA = -o writer writer.c
+#    endif
+#    ifeq ($(CROSS_COMPILE),ARM)
+#    	COMPILER_EXECUTABLE=/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-gcc
+#    	AAA = -o writer writer.c
+#    endif
 
 writer: vars
-	$(info ${CROSS_COMPILE})
-	$(info $(COMPILER_EXECUTABLE) -Wall $(CCFLAGS) $(AAA))
-	@($(COMPILER_EXECUTABLE) -Wall $(CCFLAGS) $(AAA))
+	$(info $(COMPILER_EXECUTABLE) -Wall $(CCFLAGS) $(OBJ))
+	@($(COMPILER_EXECUTABLE) -Wall $(CCFLAGS) $(OBJ))
+
 
 
