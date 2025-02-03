@@ -1,3 +1,5 @@
+assignment 4
+
 for file in $(find / -type f); do echo $(grep "a" "/entrypoint.sh" | wc -l); done
 
 docker build -t myubuntu . && docker container run -it -v /var/run/docker.sock:/var/run/docker.sock -v ./:/repo myubuntu /bin/bash
