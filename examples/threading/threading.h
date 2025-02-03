@@ -8,7 +8,12 @@
  * the joiner thread.
  */
 struct thread_data{
+    
+    pthread_t *thread_id;        /* ID returned by pthread_create() */
+    pthread_t immediate_child;    
+
     /*
+     *
      * TODO: add other values your thread will need to manage
      * into this structure, use this structure to communicate
      * between the start_thread_obtaining_mutex function and
@@ -20,8 +25,9 @@ struct thread_data{
      * if an error occurred.
      */
     bool thread_complete_success;
-};
+    long wait_to_obtain_ms;
 
+};
 
 /**
 * Start a thread which sleeps @param wait_to_obtain_ms number of milliseconds, then obtains the
