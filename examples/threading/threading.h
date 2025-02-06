@@ -12,6 +12,7 @@ struct thread_data{
     pthread_t *thread_id;        /* ID returned by pthread_create() */
     pthread_t immediate_child;    
 
+    pthread_mutex_t* mutex;
     /*
      *
      * TODO: add other values your thread will need to manage
@@ -26,12 +27,16 @@ struct thread_data{
      */
     bool thread_complete_success;
     long wait_to_obtain_ms;
-
+    long wait_to_release_ms;
 };
 
 /**
-* Start a thread which sleeps @param wait_to_obtain_ms number of milliseconds, then obtains the
-* mutex in @param mutex, then holds for @param wait_to_release_ms milliseconds, then releases.
+* Start a thread which sleeps @param wait_to_obtain_ms number of milliseconds, 
+*
+* then obtains the mutex in @param mutex, 
+*
+* then holds for @param wait_to_release_ms milliseconds, then releases.
+*
 * The start_thread_obtaining_mutex function should only start the thread and should not block
 * for the thread to complete.
 * The start_thread_obtaining_mutex function should use dynamic memory allocation for thread_data
