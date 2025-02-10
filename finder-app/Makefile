@@ -28,6 +28,8 @@ vars:
 #    	AAA = -o writer writer.c
 #    endif
 
+all: writer
+
 writer: vars
 	$(info $(COMPILER_EXECUTABLE) -Wall $(CCFLAGS) $(OBJ))
 	@($(COMPILER_EXECUTABLE) -Wall $(CCFLAGS) $(OBJ))
