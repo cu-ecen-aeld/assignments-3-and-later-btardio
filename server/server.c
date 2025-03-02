@@ -1,14 +1,42 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/socket.h>
+//#include <sys/socket.h>
 #include <sys/types.h>
 #include <syslog.h>
 #include <stdarg.h>
 #include <errno.h>
 #include <string.h>
 //#include <unistd.h>
-#include <netinet/in.h>
+//#include <netinet/in.h>
 #include <arpa/inet.h>
+
+
+int
+make_socket (uint16_t port)
+{
+  int sock;
+  struct sockaddr_in name;
+
+  /* Create the socket. */
+  sock = socket (PF_INET, SOCK_STREAM, 0);
+  if (sock < 0)
+    {
+      perror ("socket");
+      exit (EXIT_FAILURE);
+    }
+
+  /* Give the socket a name. */
+  name.sin_family = AF_INET;
+  name.sin_port = htons (port);
+  name.sin_addr.s_addr = htonl (INADDR_ANY);
+  if (bind (sock, (struct sockaddr *) &name, sizeof (name)) < 0)
+    {
+      perror ("bind");
+      exit (EXIT_FAILURE);
+    }
+
+  return sock;
+}
 
 void log_and_print(int priority, char* fmt, ...) {
     va_list args;
@@ -42,6 +70,8 @@ void *safe_malloc(size_t n)
 int main(void) {
 	printf("Server program assignment 5\n");
 
+    size_t s_size;
+
     struct in_addr my_s_addr;
 
     struct sockaddr_in sock_address;
@@ -51,7 +81,7 @@ int main(void) {
 
     //inet_aton("127.0.0.1", &sock_address.s_addr);
     
-    sock_address.sin_port = 1000;
+    sock_address.sin_port = 10000;
 
     //strncpy(&sock_address.sin_port, "10000\0", 6);
     sock_address.sin_family = AF_INET;
@@ -64,7 +94,7 @@ int main(void) {
 
     int s_fd = socket(AF_INET, SOCK_STREAM, 0);
 
-    if (s_fd == -1) {
+    if (s_fd < 0) {
         log_and_print(LOG_ERR, "Unable to create socket.\n", NULL);
         return -1;
     }
@@ -72,7 +102,7 @@ int main(void) {
 
     int b_rval = bind(s_fd, (struct sockaddr *) &sock_address, sizeof(struct sockaddr_in));
 
-    if ( b_rval == -1 ) {
+    if ( b_rval < 0 ) {
         log_and_print(LOG_ERR, "Unable to bind to port.\n", NULL);
     }
 
@@ -85,7 +115,7 @@ int main(void) {
 
 
 
-    if ( l_rval == -1 ) {
+    if ( l_rval < 0 ) {
         log_and_print(LOG_ERR, "Unable to listen on port.\n", NULL);
     }
     // listen (sockfd)
@@ -93,7 +123,7 @@ int main(void) {
     //
     // 
 
-//    struct sockaddr_in addr_connector;
+    struct sockaddr_in addr_connector;
 
 //    struct socklen_t _s_addr_and_len;
 
@@ -102,13 +132,27 @@ int main(void) {
 
     // null null, don't want to deal with privilege mode and traps?
 
-    int a_fd = accept(s_fd, NULL, NULL); //(struct sockaddr *) &addr_connector, NULL);
+    s_size = sizeof (addr_connector);
+    // = 0;
 
-    if ( a_fd == -1 ) {
-        log_and_print(LOG_ERR, "Unable to accept.\n", NULL);
+
+    for(;;) {
+    
+        // remember: sebastian files, ritchie ports - ritchie you need a pocket protector - trap
+        int a_fd = accept(s_fd, (struct sockaddr*) &addr_connector, (unsigned int *) &s_size); //(struct sockaddr *) &addr_connector, NULL);
+    
+        if ( a_fd == -1 ) {
+            log_and_print(LOG_ERR, "Unable to accept.\n", NULL);
+        }
+
+
+                        fprintf (stderr,
+                         "Server: connect from host %s, port %hd.\n",
+                         inet_ntoa (addr_connector.sin_addr),
+                         ntohs (addr_connector.sin_port));
+
     }
 
-    for(;;){}
 
     // accept
     //
