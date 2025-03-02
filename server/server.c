@@ -42,21 +42,27 @@ void *safe_malloc(size_t n)
 int main(void) {
 	printf("Server program assignment 5\n");
 
+    struct in_addr my_s_addr;
 
-    struct sockaddr sock_address;
+    struct sockaddr_in sock_address;
     
+    //my_s_addr = inet_addr("127.0.0.1");
+    inet_pton(AF_INET, "127.0.0.1", &my_s_addr);
+
     //inet_aton("127.0.0.1", &sock_address.s_addr);
-
-    strncpy(sock_address.sa_data, "10000\0", 6);
-    sock_address.sa_family = AF_INET;
     
+    sock_address.sin_port = 1000;
+
+    //strncpy(&sock_address.sin_port, "10000\0", 6);
+    sock_address.sin_family = AF_INET;
+    sock_address.sin_addr = my_s_addr;    
 
     // socket()
     //
     //
     //
 
-    int s_fd = socket(PF_INET, SOCK_STREAM, 0);
+    int s_fd = socket(AF_INET, SOCK_STREAM, 0);
 
     if (s_fd == -1) {
         log_and_print(LOG_ERR, "Unable to create socket.\n", NULL);
@@ -64,9 +70,9 @@ int main(void) {
     }
 
 
-    int bind_rval = bind(s_fd, &sock_address, sizeof(struct sockaddr));
+    int b_rval = bind(s_fd, (struct sockaddr *) &sock_address, sizeof(struct sockaddr_in));
 
-    if ( bind_rval == -1 ) {
+    if ( b_rval == -1 ) {
         log_and_print(LOG_ERR, "Unable to bind to port.\n", NULL);
     }
 
@@ -75,15 +81,34 @@ int main(void) {
     //
     //
 
+    int l_rval = listen(s_fd, 3);
 
 
+
+    if ( l_rval == -1 ) {
+        log_and_print(LOG_ERR, "Unable to listen on port.\n", NULL);
+    }
     // listen (sockfd)
     //
     //
     // 
 
+//    struct sockaddr_in addr_connector;
+
+//    struct socklen_t _s_addr_and_len;
+
+//    struct socklen_t* s_addr_and_len = &s_addr_and_len;
 
 
+    // null null, don't want to deal with privilege mode and traps?
+
+    int a_fd = accept(s_fd, NULL, NULL); //(struct sockaddr *) &addr_connector, NULL);
+
+    if ( a_fd == -1 ) {
+        log_and_print(LOG_ERR, "Unable to accept.\n", NULL);
+    }
+
+    for(;;){}
 
     // accept
     //

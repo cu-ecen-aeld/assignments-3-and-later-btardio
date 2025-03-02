@@ -49,6 +49,9 @@ RUN echo "set shiftwidth=4" >> /root/.vimrc
 RUN echo "set expandtab" >> /root/.vimrc
 RUN echo "export PATH=$PATH:/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-linux-gnu/bin/" >> /root/.bashrc
 RUN chmod +x /entrypoint.sh
+
+RUN apt-get install -y net-tools
+
 ENTRYPOINT ["/entrypoint.sh"]
 
 

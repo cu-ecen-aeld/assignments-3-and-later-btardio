@@ -1,4 +1,4 @@
-default: writer
+default: all
 
 UNAME_P := $(shell uname -p)
 
