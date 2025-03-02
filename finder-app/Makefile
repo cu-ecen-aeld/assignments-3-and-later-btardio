@@ -27,6 +27,7 @@ vars:
 #    	COMPILER_EXECUTABLE=/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-gcc
 #    	AAA = -o writer writer.c
 #    endif
+all: writer
 
 writer: vars
 	$(info $(COMPILER_EXECUTABLE) -Wall $(CCFLAGS) $(OBJ))
