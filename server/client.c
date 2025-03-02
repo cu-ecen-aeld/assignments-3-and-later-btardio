@@ -100,11 +100,11 @@ int main(void) {
     }
 
 
-    int b_rval = bind(s_fd, (struct sockaddr *) &sock_address, sizeof(struct sockaddr_in));
+    //int b_rval = bind(s_fd, (struct sockaddr *) &sock_address, sizeof(struct sockaddr_in));
 
-    if ( b_rval < 0 ) {
-        log_and_print(LOG_ERR, "Unable to bind to port.\n", NULL);
-    }
+    //if ( b_rval < 0 ) {
+    //    log_and_print(LOG_ERR, "Unable to bind to port.\n", NULL);
+    //}
 
     // bind (sockfd, sockaddr-sever)
     //

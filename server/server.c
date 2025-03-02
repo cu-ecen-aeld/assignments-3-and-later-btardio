@@ -6,18 +6,46 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <string.h>
-//#include <unistd.h>
+#include <unistd.h>
 //#include <netinet/in.h>
 #include <arpa/inet.h>
 
 
+// http://gnu.cs.utah.edu/Manuals/glibc-2.2.3/html_chapter/libc_16.html
+
+int
+read_from_client (int filedes)
+{
+  char buffer[512];
+  int nbytes;
+
+  nbytes = read (filedes, buffer, 512);
+  if (nbytes < 0)
+    {
+      /* Read error. */
+      perror ("read");
+      exit (EXIT_FAILURE);
+    }
+  else if (nbytes == 0)
+    /* End-of-file. */
+    return -1;
+  else
+    {
+      /* Data read. */
+      fprintf (stderr, "Server: got message: `%s'\n", buffer);
+      return 0;
+    }
+}
+
+
+
+/*
 int
 make_socket (uint16_t port)
 {
   int sock;
   struct sockaddr_in name;
 
-  /* Create the socket. */
   sock = socket (PF_INET, SOCK_STREAM, 0);
   if (sock < 0)
     {
@@ -25,7 +53,6 @@ make_socket (uint16_t port)
       exit (EXIT_FAILURE);
     }
 
-  /* Give the socket a name. */
   name.sin_family = AF_INET;
   name.sin_port = htons (port);
   name.sin_addr.s_addr = htonl (INADDR_ANY);
@@ -37,6 +64,7 @@ make_socket (uint16_t port)
 
   return sock;
 }
+*/
 
 void log_and_print(int priority, char* fmt, ...) {
     va_list args;
@@ -75,7 +103,9 @@ int main(void) {
     struct in_addr my_s_addr;
 
     struct sockaddr_in sock_address;
-    
+
+    fd_set active_fd_set, read_fd_set;
+
     //my_s_addr = inet_addr("127.0.0.1");
     inet_pton(AF_INET, "127.0.0.1", &my_s_addr);
 
@@ -136,23 +166,87 @@ int main(void) {
     // = 0;
 
 
+  /* Initialize the set of active sockets. */
+  FD_ZERO (&active_fd_set);
+  FD_SET (s_fd, &active_fd_set);
+
+  while (1)
+    {
+      /* Block until input arrives on one or more active sockets. */
+      read_fd_set = active_fd_set;
+      if (select (FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) < 0)
+        {
+          perror ("select");
+          exit (EXIT_FAILURE);
+        }
+
+      /* Service all the sockets with input pending. */
+      for (int i = 0; i < FD_SETSIZE; ++i)
+        if (FD_ISSET (i, &read_fd_set))
+          {
+            if (i == s_fd)
+              {
+                /* Connection request on original socket. */
+                int new;
+                s_size = sizeof (addr_connector);
+
+                new = accept(s_fd, (struct sockaddr*) &addr_connector, (unsigned int *) &s_size); //(struct sockaddr *) &addr_connector, NULL);
+
+                if ( new < 0 ) {
+                    log_and_print(LOG_ERR, "Unable to accept.\n", NULL);
+                }
+
+//                new = accept (sock,
+//                              (struct sockaddr *) &clientname,
+//                              &size);
+//                if (new < 0)
+//                  {
+//                    perror ("accept");
+//                    exit (EXIT_FAILURE);
+//                  }
+
+                fprintf (stderr,
+                         "Server: connect from host %s, port %hd.\n",
+                         inet_ntoa (addr_connector.sin_addr),
+                         ntohs (addr_connector.sin_port));
+                FD_SET (new, &active_fd_set);
+              }
+            else
+              {
+                /* Data arriving on an already-connected socket. */
+                if (read_from_client (i) < 0)
+                  {
+                    close (i);
+                    FD_CLR (i, &active_fd_set);
+                  }
+              }
+          }
+    }
+
+    /*
     for(;;) {
     
         // remember: sebastian files, ritchie ports - ritchie you need a pocket protector - trap
+        printf("i am blocking\n");
         int a_fd = accept(s_fd, (struct sockaddr*) &addr_connector, (unsigned int *) &s_size); //(struct sockaddr *) &addr_connector, NULL);
-    
+         
         if ( a_fd == -1 ) {
             log_and_print(LOG_ERR, "Unable to accept.\n", NULL);
         }
 
 
+        //if (FD_ISSET (i, &read_fd_set))
+
+        read_from_client (s_fd + 1 + 1 + 1);
+        // TODO: Logs message to the syslog “Accepted connection from xxx” where XXXX is the IP address of the connected client. 
+//        vsyslog(LOG_ERR, "Accepted connection from %s\n", inet_ntoa(addr_connector.sin_addr));
                         fprintf (stderr,
                          "Server: connect from host %s, port %hd.\n",
                          inet_ntoa (addr_connector.sin_addr),
                          ntohs (addr_connector.sin_port));
 
     }
-
+*/
 
     // accept
     //
