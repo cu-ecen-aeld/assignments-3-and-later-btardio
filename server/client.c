@@ -6,7 +6,7 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <string.h>
-//#include <unistd.h>
+#include <unistd.h>
 //#include <netinet/in.h>
 #include <arpa/inet.h>
 
@@ -70,7 +70,7 @@ void *safe_malloc(size_t n)
 int main(void) {
 	printf("Server program assignment 5\n");
 
-    size_t s_size;
+    //size_t s_size;
 
     struct in_addr my_s_addr;
 
@@ -118,8 +118,15 @@ int main(void) {
         return -1;
     }
 
+    char buffer[512] = "Hello, world!\0";
 
+    write(s_fd, buffer, 100);
 
+    //char responsebuffer[512] = "                                                               \0";
+
+    // read(s_fd, buffer, 100);
+
+    //printf("Client Received: %s\n", responsebuffer);
     // accept
     //
     //

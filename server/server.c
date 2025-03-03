@@ -9,17 +9,58 @@
 #include <unistd.h>
 //#include <netinet/in.h>
 #include <arpa/inet.h>
+#include <signal.h>
 
 
 // http://gnu.cs.utah.edu/Manuals/glibc-2.2.3/html_chapter/libc_16.html
+
+// NOTE: using AF_INET is not bidirectional
+
+
+void sig_handler(int signo)
+{
+  if (signo == SIGINT) {
+    printf("Caught signal, exiting");
+    exit(0);
+  }
+  if (signo == SIGTERM) {
+    printf("Caught signal, exiting");
+    exit(0);
+  }
+}
+
+
+
+
+void log_and_print(int priority, char* fmt, ...) {
+    va_list args;
+
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+    printf("Errno: %d\n", errno);
+    perror("Error:");
+    fflush(stdout);
+
+    va_start(args, fmt);
+    vsyslog(priority, fmt, args);
+    va_end(args);
+}
+
+
 
 int
 read_from_client (int filedes)
 {
   char buffer[512];
   int nbytes;
+//  int sbytes;
+
+  FILE *file_pointer;
+
 
   nbytes = read (filedes, buffer, 512);
+
   if (nbytes < 0)
     {
       /* Read error. */
@@ -31,8 +72,53 @@ read_from_client (int filedes)
     return -1;
   else
     {
-      /* Data read. */
+      
       fprintf (stderr, "Server: got message: `%s'\n", buffer);
+
+      //return 0;
+      // write to same FD
+      
+      
+      //sbytes = write(filedes, buffer, 512);
+
+
+      //if (sbytes < 0){
+      //    perror("write");
+      //    exit(EXIT_FAILURE);
+      //}
+
+
+      // end write to same FD
+
+      file_pointer = fopen("/var/tmp/aesdsocketdata", "a");
+
+      if ( file_pointer == NULL ){
+          log_and_print(LOG_ERR, "Error writing to file.\n", NULL);
+          return -1;
+      }
+
+      if (fputs(buffer, file_pointer) == EOF) {
+          perror("Error writing to file");
+          fclose(file_pointer);
+          return -1;
+      }
+
+      if (fputs("\n", file_pointer) == EOF) {
+          perror("Error writing to file");
+          fclose(file_pointer);
+          return -1;
+      }
+/*
+      if (fflush(file_pointer) == EOF) {
+          perror("Error flushing.");
+          return -1;
+      }
+*/
+      if (fclose(file_pointer) == EOF) {
+          perror("Error closing the file");
+          return -11;
+      }
+
       return 0;
     }
 }
@@ -66,20 +152,6 @@ make_socket (uint16_t port)
 }
 */
 
-void log_and_print(int priority, char* fmt, ...) {
-    va_list args;
-
-    va_start(args, fmt);
-    vprintf(fmt, args);
-    va_end(args);
-    printf("Errno: %d\n", errno);
-    perror("Error:");
-    fflush(stdout);
-
-    va_start(args, fmt);
-    vsyslog(priority, fmt, args);
-    va_end(args);
-}
 
 
 //struct sockaddr sock_address = { AF_INET, "10005" };
@@ -96,7 +168,18 @@ void *safe_malloc(size_t n)
 
 
 int main(void) {
-	printf("Server program assignment 5\n");
+
+    if (signal(SIGINT, sig_handler) == SIG_ERR) {
+        log_and_print(LOG_ERR, "Unable to create signal handler.\n", NULL);
+    }
+
+
+    if (signal(SIGTERM, sig_handler) == SIG_ERR) {
+        log_and_print(LOG_ERR, "Unable to create signal handler.\n", NULL);
+    }
+
+
+    printf("Server program assignment 5\n");
 
     size_t s_size;
 
