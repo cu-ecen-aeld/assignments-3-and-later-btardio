@@ -1,20 +1,66 @@
 #!/bin/sh
 
-case "$1" in
-    start)
-        echo "Starting simpleserver"
-        start-stop-daemon -S -n simpleserver -a /bin/aesdsocket
-        ;;
-    stop)
-        echo "Stopping simpleserver"
-        start-stop-daemon -K -n simpleserver
-        ;;
-    *)
-        echo "Usage $0 {start|stop}"
-    exit 1
-esac
+DAEMON="aesdsocket"
+PIDFILE="/var/run/$DAEMON.pid"
 
-exit 0
+
+start() {
+    printf 'Starting %s: ' "$DAEMON"
+    # shellcheck disable=SC2086 # we need the word splitting
+    start-stop-daemon -b -m -S -q -p "$PIDFILE" -x "/bin/$DAEMON" \
+         -- -n $SYSLOGD_ARGS
+    status=$?
+    if [ "$status" -eq 0 ]; then
+         echo "OK"
+    else
+         echo "FAIL"
+    fi
+    return "$status"
+}
+
+stop() {
+  printf 'Stopping %s: ' "$DAEMON"
+  start-stop-daemon -K -q -p "$PIDFILE"
+  status=$?
+  if [ "$status" -eq 0 ]; then
+    rm -f "$PIDFILE"
+    echo "OK"
+  else
+    echo "FAIL"
+  fi
+  return "$status"
+}
+
+
+case "$1" in
+     start|stop|restart)
+         "$1";;
+     reload)
+         # Restart, since there is no true "reload" feature.
+         restart;;
+     *)
+         echo "Usage: $0 {start|stop|restart|reload}"
+         exit 1
+ esac
+
+
+
+# case "$1" in
+#    start)
+#        echo "Starting simpleserver"
+#        start-stop-daemon -S -n simpleserver -a /bin/aesdsocket
+#        ;;
+#    stop)
+#        echo "Stopping simpleserver"
+#        start-stop-daemon -K -n simpleserver
+#        ;;
+#    *)
+#        echo "Usage $0 {start|stop}"
+#    exit 1
+#esac
+
+#exit 0
+
 
 
 			
