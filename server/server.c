@@ -8,7 +8,6 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <signal.h>
-#include <sys/wait.h>
 #define BUFFER_SIZE 999999
 
 // http://gnu.cs.utah.edu/Manuals/glibc-2.2.3/html_chapter/libc_16.html
@@ -266,16 +265,16 @@ int main(int argc, char* argv[]){
     } else {                          
         perror("Error deleting file");
     }                               
-                                                                   
-    pid_t p = fork();                                        
+    
+    if ( argc > 1 ) {
+    
+        pid_t p = fork();                                        
                                             
-    if ( p == 0 ) {                  
-        pmain();                                                       
-    }                                          
-    else {                                 
-        if(argc > 1){                    
-                waitpid(p, NULL, 0);
-        }                            
+        if ( p == 0 ) {                  
+            pmain();                                                       
+        }                                          
+    } else {
+        pmain();        
     }                 
                                                                             
 }
