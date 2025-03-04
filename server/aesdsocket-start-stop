@@ -1,0 +1,20 @@
+#!/bin/sh
+
+case "$1" in
+    start)
+        echo "Starting simpleserver"
+        start-stop-daemon -S -n simpleserver -a /bin/aesdsocket
+        ;;
+    stop)
+        echo "Stopping simpleserver"
+        start-stop-daemon -K -n simpleserver
+        ;;
+    *)
+        echo "Usage $0 {start|stop}"
+    exit 1
+esac
+
+exit 0
+
+
+			
