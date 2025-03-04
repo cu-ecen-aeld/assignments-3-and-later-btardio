@@ -6,6 +6,8 @@ COMPILER_EXECUTABLE=$(CROSS_COMPILE)gcc
 
 OBJ = -o writer writer.c
 
+all: writer
+
 clean:
 	rm -f writer
 
