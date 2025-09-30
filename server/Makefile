@@ -21,7 +21,9 @@ default: all
 
 UNAME_P := $(shell uname -p)
 
-#COMPILER_EXECUTABLE=$(CROSS_COMPILE)gcc
+# COMPILER_EXECUTABLE=$(CROSS_COMPILE)gcc
+
+CC = $(CROSS_COMPILE)gcc
 
 TARGET_SERVER = aesdsocket
 TARGET_TEST = aesdsocket_test
