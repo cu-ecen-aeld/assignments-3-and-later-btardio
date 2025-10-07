@@ -1,8 +1,10 @@
-#include <stdio.h>
 #include <sys/types.h>
-#include <unistd.h>
-
+//#include <linux/ioctl.h>
+#include <stdio.h>
 int pmain(void);
+
+
+
 
 
 

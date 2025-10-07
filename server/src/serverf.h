@@ -13,8 +13,10 @@
 #include <fcntl.h>
 #include <sys/shm.h>
 #include <semaphore.h>
-#include <unistd.h>
-#include <sys/wait.h>
+#include <linux/ioctl.h>
+#include <syslog.h>
+
+#ifndef _SERVERF
 
 void sig_handler(int signo);
 
@@ -60,4 +62,9 @@ struct entry {
 
 
 
+#define MAJOR_NUM 123
 
+#define IOCTL_SET_MSG _IOR(MAJOR_NUM, 0, int *)
+
+
+#endif
