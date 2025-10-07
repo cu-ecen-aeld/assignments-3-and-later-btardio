@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <sys/shm.h>
 #include <semaphore.h>
+#include <sys/wait.h>
 //#include <linux/ioctl.h>
 #include <sys/ioctl.h>
 #include <syslog.h>
