@@ -13,7 +13,8 @@
 #include <fcntl.h>
 #include <sys/shm.h>
 #include <semaphore.h>
-#include <linux/ioctl.h>
+//#include <linux/ioctl.h>
+#include <sys/ioctl.h>
 #include <syslog.h>
 
 #ifndef _SERVERF
