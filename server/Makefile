@@ -1,10 +1,9 @@
-
 UNITY_ROOT=test/Unity/
 
 # CFLAGS=-std=c89
 # CFLAGS += -Wall
-# //CFLAGS += -Wextra
-# //CFLAGS += -Wpointer-arith
+# CFLAGS += -Wextra
+# CFLAGS += -Wpointer-arith
 # CFLAGS += -Wcast-align
 # CFLAGS += -Wwrite-strings
 # CFLAGS += -Wswitch-default
@@ -17,11 +16,7 @@ UNITY_ROOT=test/Unity/
 
 LDFLAGS += -pthread
 
-default: all
-
-UNAME_P := $(shell uname -p)
-
-#COMPILER_EXECUTABLE=$(CROSS_COMPILE)gcc
+# default: aesdsocket
 
 TARGET_SERVER = aesdsocket
 TARGET_TEST = aesdsocket_test
@@ -34,15 +29,14 @@ TARGET_TEST = aesdsocket_test
 SRC_FILES=src/serverf.c src/server.c
 TEST_SRC_FILES=$(UNITY_ROOT)/src/unity.c src/serverf.c test/server_test.c test/test_runners/server_test_runner.c
 INC_DIRS=-Isrc -I$(UNITY_ROOT)/src
-SYMBOLS=
+SYMBOLS=server_test.o
 
-clean:
-	rm -f aesdsocket
-	rm -f aesdsocket_test
 
-all: $(TARGET_SERVER)
+all: default
 
-$(TARGET_SERVER):
+default: socketserver
+
+socketserver:
 	$(CC) $(CFLAGS) $(LDFLAGS) $(INC_DIRS) $(SRC_FILES) -o $(TARGET_SERVER)
 
 test: server_test_runner
@@ -53,6 +47,9 @@ server_test_runner: test/server_test.c
 	#$(info $(COMPILER_EXECUTABLE) -Wall $(CCFLAGS) $(TEST_OBJ))
 	#@($(COMPILER_EXECUTABLE) -Wall $(CCFLAGS) $(TEST_OBJ))
 
+clean:
+	rm -f aesdsocket
+	rm -f aesdsocket_test
 
 
 
