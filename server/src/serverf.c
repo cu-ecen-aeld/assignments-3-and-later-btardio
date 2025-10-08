@@ -396,12 +396,13 @@ read_from_client (const int filedes, char* buffer, int nbytes)
         fseek(file, 0, SEEK_SET);
 	
 	if ( instruction_seek == 1 ) {
+		printf("seeking somewhere\n");
 		fseek(file, ioctl_offset, SEEK_SET);
 	} 
 
 
         size_t bytes_read;
-       
+      	 
 	if ( instruction_seek == 1 ) { 
 		bytes_read = fread(fbuffer, 1, file_size, file);
 	} else {
