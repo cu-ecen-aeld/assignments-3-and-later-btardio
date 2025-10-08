@@ -78,7 +78,7 @@ extern sem_t mutex;
 struct entry;
 
 
-size_t find_first_trailing_null(const char *buffer, size_t size) {
+size_t find_null(const char *buffer, size_t size) {
     if (buffer == NULL) {
         return -1; // Or handle as an error
     }
@@ -419,9 +419,9 @@ read_from_client (const int filedes, char* buffer, int nbytes)
         fclose(file);
 	printf("filedes: %d\n", filedes);
 
-	int firstnullchar = find_first_trailing_null(fbuffer, file_size); //custom_strlen(fbuffer);
+	int firstnullchar = find_null(fbuffer, file_size); //custom_strlen(fbuffer);
 
-        printf("firstnullchar: %d\n", firstnullchar);
+        printf("0firstnullchar: %d\n", firstnullchar);
 	printf("bytes_read: %d\n", bytes_read);
 	printf("file_size: %d\n", file_size);
 	printf("sending: %s\n", fbuffer);
