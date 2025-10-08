@@ -424,7 +424,7 @@ read_from_client (const int filedes, char* buffer, int nbytes)
         printf("0firstnullchar: %d\n", firstnullchar);
 	printf("bytes_read: %d\n", bytes_read);
 	printf("file_size: %d\n", file_size);
-	printf("sending: %s\n", fbuffer);
+	printf("sending: %.*s\n", file_size, fbuffer);
 	sbytes = write(filedes, fbuffer, firstnullchar ); // bytes_read); //file_size);
 	printf("...\n");
 #else
