@@ -397,7 +397,11 @@ read_from_client (const int filedes, char* buffer, int nbytes)
 
 	int firstnullchar = custom_strlen(fbuffer);
 
-        sbytes = write(filedes, fbuffer, firstnullchar ); // bytes_read); //file_size);
+        printf("firstnullchar: %d\n", firstnullchar);
+	printf("bytes_read: %d\n", bytes_read);
+	printf("file_size: %d\n", file_size);
+	printf("sending: %s\n", fbuffer);
+	sbytes = write(filedes, fbuffer, firstnullchar ); // bytes_read); //file_size);
 	printf("...\n");
 #else
 
