@@ -77,12 +77,37 @@ extern sem_t mutex;
 
 struct entry;
 
-size_t custom_strlen(const char *str) {
-    size_t length = 0;
-    while (str[length] != '\0') {
-        length++;
+
+size_t find_first_trailing_null(const char *buffer, size_t size) {
+    if (buffer == NULL) {
+        return -1; // Or handle as an error
     }
-    return length;
+
+    // Find the last non-null character
+    // The memrchr function is a GNU extension, but can be implemented manually.
+    // In this example, we use a manual loop for portability.
+    for (size_t i = size; i > 0; --i) {
+        if (buffer[i - 1] != '\0') {
+            // The first null is right after the last non-null character
+            return i;
+        }
+    }
+
+    // If the entire buffer is null, the first trailing null is at index 0
+    return 0;
+}
+
+size_t custom_strlen(const char *str) {
+	size_t length = 0;
+	char previous = '';
+
+	
+	while (str[length] != '\0') {
+		length++;
+	}
+
+
+	return length;
 }
 
 void sig_handler(int signo)
@@ -395,7 +420,7 @@ read_from_client (const int filedes, char* buffer, int nbytes)
         fclose(file);
 	printf("filedes: %d\n", filedes);
 
-	int firstnullchar = custom_strlen(fbuffer);
+	int firstnullchar = find_first_trailing_null(fbuffer, file_size); //custom_strlen(fbuffer);
 
         printf("firstnullchar: %d\n", firstnullchar);
 	printf("bytes_read: %d\n", bytes_read);
