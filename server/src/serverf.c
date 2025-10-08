@@ -99,7 +99,6 @@ size_t find_first_trailing_null(const char *buffer, size_t size) {
 
 size_t custom_strlen(const char *str) {
 	size_t length = 0;
-	char previous = '';
 
 	
 	while (str[length] != '\0') {
